@@ -48,7 +48,7 @@ class TestProdSeries(unittest.TestCase):
         b[:2] = [1., -1.] # b = 1 - X
         res = np.zeros(7)
         res[0] = 1.
-        assert np.allclose(prod_series(a, b), res)
+        np.testing.assert_allclose(prod_series(a, b), res)
 
     def test_B(self):
         a = [2., -3., 5.]
@@ -64,7 +64,7 @@ class TestProdSeries(unittest.TestCase):
         c = np.arange(10)
         a = np.array([1., 2.])[:, None] * c
         b = a.copy()
-        assert(np.array_equal(prod_series(a, b, axis=-1), np.array([prod_series(c, c), 4. * prod_series(c, c)])))
+        assert(np.array_equal(prod_series(a, b, axis1=-1, axis2=-1), np.array([prod_series(c, c), 4. * prod_series(c, c)])))
 
 
 class TestOneOverSeries(unittest.TestCase):
@@ -74,13 +74,13 @@ class TestOneOverSeries(unittest.TestCase):
         a = np.random.randn(10)
         b = one_over_series(a)
         c = one_over_series(b)
-        assert np.allclose(a, c)
+        np.testing.assert_allclose(a, c, atol=1e-3)
 
     def test_B(self):
         a = np.ones(10) # a = 1/(1 - X)
         res = np.zeros(10)
         res[:2] = [1., -1.] # res = 1 - X
-        assert np.allclose(one_over_series(a), res)
+        np.testing.assert_allclose(one_over_series(a), res)
         assert np.array_equal(a, np.ones(10)) # initial series hasn't changed
 
     def test_C(self):
@@ -94,31 +94,31 @@ class TestDivideSeries(unittest.TestCase):
 
     def test_A(self):
         a = np.zeros(10)
-        a[0] = 1.
+        a[0] = 1. # a = 1
         b = np.zeros(12)
         b[:2] = [-1., 1.] # b = X - 1
         res = -np.ones(10)
-        assert np.allclose(divide_series(a, b), res)
+        np.testing.assert_allclose(divide_series(a, b), res)
 
     def test_B(self):
         a = np.array([0., 2., -3.j, 0., 0.], dtype=complex)
         b = np.array([1., 0., 0., -4., 0.], dtype=complex)
         res = np.array([0., 2., -3.j, 0., 8.], dtype=complex)
-        assert np.allclose(divide_series(a, b), res)
+        np.testing.assert_allclose(divide_series(a, b), res)
         assert divide_series(a, b)[0] == 0.
 
     def test_C(self):
         a = np.random.randn(10)
         b = np.random.randn(5)
         ab = prod_series(a, b)
-        assert np.allclose(divide_series(ab, a), b)
-        assert np.allclose(divide_series(ab, b), a[:5])
+        np.testing.assert_allclose(divide_series(ab, a), b)
+        np.testing.assert_allclose(divide_series(ab, b), a[:5])
 
     def test_D(self):
         a = np.array([[0., 2., -3.j, 0., 0.], [0., 2., -3.j, 0., 0.]], dtype=complex)
         b = np.array([[1., 0., 0., -4., 0.], [1., 0., 0., -4., 0.]], dtype=complex)
         res = np.array([[0., 2., -3.j, 0., 8.], [0., 2., -3.j, 0., 8.]], dtype=complex)
-        assert np.allclose(divide_series(a, b, axis=1), res)
+        np.testing.assert_allclose(divide_series(a, b, axis1=1, axis2=1), res)
 
 
 class TestComposeSeries(unittest.TestCase):
@@ -127,7 +127,7 @@ class TestComposeSeries(unittest.TestCase):
         a = np.array([1., 1, 0]) # a = 1 + X
         b = np.array([0., 0, 1]) # b = X^2
         a_of_b = np.array([1., 0, 1]) # a_of_b = 1 + X^2
-        assert np.allclose(compose_series(a, b), a_of_b)
+        np.testing.assert_allclose(compose_series(a, b), a_of_b)
 
     def test_B(self):
         a = np.ones(10)
@@ -136,7 +136,7 @@ class TestComposeSeries(unittest.TestCase):
         rev_a[0] = 0. # rev_a = X / (1 + X)
         res = np.zeros(10)
         res[1] = 1. # res = X
-        assert np.allclose(compose_series(a, rev_a), res)
+        np.testing.assert_allclose(compose_series(a, rev_a), res)
 
 
 class TestReverseSeries(unittest.TestCase):
@@ -146,16 +146,16 @@ class TestReverseSeries(unittest.TestCase):
         a[0] = 0. # a = X / (1 - X)
         rev_a = - (-1.) ** np.arange(10)
         rev_a[0] = 0. # rev_a = X / (1 + X)
-        assert np.allclose(reverse_series(a), rev_a)
+        np.testing.assert_allclose(reverse_series(a), rev_a)
         res = np.zeros(10)
         res[1] = 1. # res = X
-        assert np.allclose(compose_series(a, rev_a), res)
+        np.testing.assert_allclose(compose_series(a, rev_a), res)
 
     def test_B(self):
         a = np.ones(10) # a = 1 + X / (1 - X)
         rev_a = - (-1.) ** np.arange(10)
         rev_a[0] = 0. # rev_a = X / (1 + X) (same as previous, constant coeff doesnt matter)
-        assert np.allclose(reverse_series(a), rev_a)
+        np.testing.assert_allclose(reverse_series(a), rev_a)
 
 
 if __name__ == '__main__':
