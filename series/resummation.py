@@ -48,9 +48,7 @@ from functools import reduce
 
 
 def resum_series(series, conformal_trans, axis=0):
-    series_ = np.moveaxis(series, axis, 0)
-    trans_series = compose_series(series_, conformal_trans.rev_series(len(series_) - 1), axis=0)
-    return np.moveaxis(trans_series, 0, axis)
+    return compose_series(series, conformal_trans.rev_series(series.shape[axis] - 1), axis, 0)
 
 
 class IdentityTransform(object):
