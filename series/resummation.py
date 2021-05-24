@@ -560,67 +560,40 @@ def partial_sum_series(series, U, axis=0):
 # print sum_series(np.ones((5, 10)), 4., axis=0)
 
 
-def error_sum_series(series, U, start_geom, Rc=None, verbose=True):
+def error_sum_series(series, U_list, start_geom, Rc=None, axis=-1, verbose=True):
     """
     Returns an upper bound estimate of the truncation error when evaluating `series` at `U`.
 
-    `series` an array (M, N1, ..., Nd), M is the number of orders
-    `U` a scalar
     `start_geom` an int, the series is considered geometric after this order
-    `Rc` a scalar or (N1, ..., Nd) array, the convergence radius of the series.
+    `Rc` a scalar or array, the convergence radius of the series.
     If not provided, will be computed on the geometric part of the series using robust method.
-    Returns a (N1, ..., Nd) array.
 
-    Error is the numpy inf if U > Rc.
+    Broadcasting rules apply.
     """
-
-    series = np.asarray(series)
-    single_series = series.ndim <= 1
+    series = np.moveaxis(series, axis, 0)
+    U_list = np.abs(np.asarray(U_list))
 
     if Rc is None:
         Rc = Rconv_robust(series[start_geom:], axis=0)[0]
         if verbose:
             print('Rc computed:', Rc)
     else:
-        Rc = np.abs(Rc)
+        Rc = np.asarray(Rc)
 
-    U = np.abs(U)
     series_unit = rescale_series(series, Rc, axis=0)[start_geom:]
     prefact = np.max(np.abs(series_unit), axis=0)
     N = len(series) - 1
 
-    error = old_div(prefact * (old_div(U, Rc)) ** (N + 1), (1. - old_div(U, Rc)))
+    error = prefact * (U_list / Rc) ** (N + 1) / (1. - U_list / Rc)
 
-    if single_series:
+    try:
+        error[error < 0.] = +np.inf
+    except TypeError:
         if error < 0.:
             error = +np.inf
-    else:
-        error[error < 0.] = +np.inf
 
     return error
 
-def error_sum_series_v(series, U_list, start_geom=None, Rc=None, verbose=True):
-    """
-    Vectorialized (regarding U) version of error_sum_series.
-    Output gains an axis after the last of `series`.
-
-    see docstring of error_sum_series.
-    """
-
-    if start_geom is None and Rc is None:
-        raise ValueError("`start_geom` or `Rc` must be provided")
-
-    output = np.empty(series[0].shape + (len(U_list),), dtype=float)
-
-    if Rc is None:
-        Rc = Rconv_robust(series[start_geom:], axis=0)[0]
-        if verbose:
-            print('Rc computed:', Rc)
-
-    for k, U in enumerate(U_list):
-        output[..., k] = error_sum_series(series, U, start_geom=start_geom, Rc=Rc)
-
-    return output
 
 class RealSeries(object):
 

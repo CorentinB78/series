@@ -4,16 +4,19 @@ xarray wrappers for some functions dealing with numpy arrays.
 # import numpy as np
 import xarray as xr
 
-def _check_array(a):
+def _check_array(a, allow_number=False):
     if not(isinstance(a, xr.DataArray) or isinstance(a, xr.Dataset)):
-        raise TypeError('Not an xarray instance')
+        if allow_number and (isinstance(a, complex) or isinstance(a, float) or isinstance(a, int)):
+            pass
+        else:
+            raise TypeError('Not an xarray instance')
 
 ############################ arithmetics ##########################
 from . import arithmetics
 
 # def rescale_series(series, U, dim):
     # _check_array(series)
-    # _check_array(U)
+    # _check_array(U, True)
 #     return xr.apply_ufunc(arithmetics.rescale_series, series, U, input_core_dims=[[dim], []], output_core_dims=[[dim]], kwargs={'axis': -1})
 
 def prod_series(series1, series2, dim):
@@ -56,9 +59,15 @@ def resum_series(series, conformal_trans, dim):
 
 def sum_series(series, U, dim):
     _check_array(series)
-    _check_array(U)
+    _check_array(U, True)
     # TODO: check dim is not in U
     return xr.apply_ufunc(resummation.sum_series, series, U, input_core_dims=[[dim], []], output_core_dims=[[]], exclude_dims={dim}, kwargs={'axis': -1})
 
+def error_sum_series(series, U, start_geom, dim, Rc=None, verbose=True):
+    _check_array(series)
+    _check_array(U, True)
+    return xr.apply_ufunc(resummation.error_sum_series, series, U, start_geom, Rc, input_core_dims=[[dim], [], [], []], output_core_dims=[[]], exclude_dims={dim}, kwargs={'axis': -1, 'verbose': verbose})
+
 resum_series.__doc__ = resummation.resum_series.__doc__
 sum_series.__doc__ = resummation.sum_series.__doc__
+error_sum_series.__doc__ = resummation.error_sum_series.__doc__
