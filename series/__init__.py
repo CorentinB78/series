@@ -9,4 +9,5 @@ __author__ = 'Corentin Bertrand'
 from .arithmetics import *
 from .creation import *
 from .resummation import *
+from .pade import *
 from . import xarray_wrappers as xr
