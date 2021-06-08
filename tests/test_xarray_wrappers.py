@@ -2,12 +2,14 @@ import unittest
 import numpy as np
 import xarray as xr
 from series import arithmetics
+from series import resummation
 # from series.xarray_wrappers import rescale_series
 from series.xarray_wrappers import prod_series
 from series.xarray_wrappers import one_over_series
 # from series.xarray_wrappers import divide_series
 # from series.xarray_wrappers import compose_series
 # from series.xarray_wrappers import reverse_series
+from series.xarray_wrappers import error_sum_series
 
 # class TestRescaleSeries(unittest.TestCase):
 
@@ -172,6 +174,24 @@ class TestOneOverSeries(unittest.TestCase):
 #         rev_a[0] = 0. # rev_a = X / (1 + X) (same as previous, constant coeff doesnt matter)
 #         assert np.allclose(reverse_series(a), rev_a)
 
+class TestErrorSumSeries(unittest.TestCase):
+
+    def test_B(self):
+        a = xr.DataArray(np.ones(5), dims=['order'])
+        U = 0.3
+        error = error_sum_series(a, U, start_geom=0, dim='order', verbose=False)
+        self.assertEqual(error, 0.3 ** 5 / (1. - 0.3))
+
+    def test_D(self):
+        a = [[1., 1., 1., 1.],
+             [1., 0.5, 0.25, 0.125]]
+        a = xr.DataArray(a, dims=['x', 'order'])
+        U = xr.DataArray([0.1, 0.2, 0.3], dims=['U'])
+        ref = [[0.1**4 / (1. - 0.1), 0.2**4 / (1. - 0.2), 0.3**4 / (1. - 0.3)],
+               [(0.1/2.)**4 / (1. - 0.1/2.), (0.2/2.)**4 / (1. - 0.2/2.), (0.3/2.)**4 / (1. - 0.3/2.)]]
+        ref = xr.DataArray(ref, dims=['x', 'U'])
+        error = error_sum_series(a, U, start_geom=0, dim='order', verbose=False)
+        xr.testing.assert_equal(error, ref)
 
 if __name__ == '__main__':
     unittest.main()
