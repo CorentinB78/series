@@ -1,10 +1,45 @@
 import unittest
 import numpy as np
 from series.resummation import resum_series
+from series.resummation import Rconv_1d
+from series.resummation import Rconv_robust_1d
 from series.resummation import error_sum_series
 # from series.resummation import sum_series
 from series.resummation import EulerTransform
 
+class TestRconv1D(unittest.TestCase):
+
+    def test_A(self):
+        a = np.ones(10)
+        Rc, err, r_val = Rconv_1d(a)
+        self.assertAlmostEqual(Rc, 1.0)
+
+    def test_B(self):
+        a = 3. * np.array([1., 2., 4., 8., 16.])
+        Rc, err, r_val = Rconv_1d(a)
+        self.assertAlmostEqual(Rc, 0.5)
+
+    def test_C(self):
+        a = 3. * np.array([1., 0., 4., 0., 16.])
+        Rc, err, r_val = Rconv_1d(a)
+        self.assertAlmostEqual(Rc, 0.5)
+
+class TestRconv1DRobust(unittest.TestCase):
+
+    def test_A(self):
+        a = np.ones(10)
+        Rc, lo, up = Rconv_robust_1d(a)
+        self.assertAlmostEqual(Rc, 1.0)
+
+    def test_B(self):
+        a = 3. * np.array([1., 2., 4., 8., 16.])
+        Rc, lo, up = Rconv_robust_1d(a)
+        self.assertAlmostEqual(Rc, 0.5)
+
+    def test_C(self):
+        a = 3. * np.array([1., 0., 4., 0., 16.])
+        Rc, lo, up = Rconv_robust_1d(a)
+        self.assertAlmostEqual(Rc, 0.5)
 
 class TestResumSeries(unittest.TestCase):
 

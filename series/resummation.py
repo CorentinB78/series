@@ -421,18 +421,41 @@ class PtDTransform(object):
 
 ########## Convergence radius ##########
 
-from scipy import stats
-def Rconv_1d(series):
-    x = np.arange(len(series))
-    y = np.log(np.abs(series))
-    mask = np.isfinite(y)
-    if (np.sum(mask, axis=0) < 2):
-        return np.inf, np.nan, np.nan
-    slope, intercept, r_value, p_value, std_err = stats.linregress(x[mask], y[mask])
+import numpy.ma as ma
+from scipy.stats import mstats
+def _prepare_rconv_series(series, x=None):
+    y = np.squeeze(np.asarray(series))
+    if y.ndim != 1:
+        raise ValueError("`series` should be a 1D array-like")
+    if x is None:
+        x = np.arange(len(y))
+    else:
+        x = np.squeeze(np.asarray(x))
+    mask = y == 0.0
+    if (np.sum(~mask) < 2):
+        raise ValueError("Needs at least two finite values to compute a slope!")
+    x = ma.masked_array(x, mask=mask)
+    y = ma.masked_array(y, mask=mask)
+    y = ma.log(ma.abs(y))
+    return x, y
+
+def Rconv_1d(series, x=None):
+    x, y = _prepare_rconv_series(series, x=x)
+    slope, intercept, r_value, p_value, std_err = stats.mstats.linregress(x, y)
 
     rconv = np.exp(-slope)
     return rconv, std_err * rconv, r_value
 
+def Rconv_robust_1d(series, x=None, alpha=0.7, interc=False):
+    x, y = _prepare_rconv_series(series, x=x)
+    slope, intercept, lo_bound, up_bound = mstats.theilslopes(y, x=x, alpha=alpha)
+
+    if interc:
+        return np.exp(intercept), np.exp(-slope)
+    else:
+        return np.exp(-slope), np.exp(-up_bound), np.exp(-lo_bound)
+
+from scipy import stats
 def Rconv(series):
     if series.ndim == 1:
         series = series[..., None]
@@ -453,24 +476,6 @@ def Rconv(series):
 
     rconv = np.exp(-slopes)
     return rconv, errs * rconv
-
-from scipy.stats import mstats
-def Rconv_robust_1d(series, x=None, alpha=0.7, interc=False):
-    if x is None:
-        x = np.arange(len(series))
-
-    y = np.log(np.abs(series))
-    mask = np.isfinite(y)
-
-    if np.sum(mask) > 1:
-        slope, intercept, lo_bound, up_bound = mstats.theilslopes(y[mask], x=x[mask], alpha=alpha)
-    else:
-        raise RuntimeError("Needs at least two finite values to compute a slope!")
-
-    if interc:
-        return np.exp(intercept), np.exp(-slope)
-    else:
-        return np.exp(-slope), np.exp(-up_bound), np.exp(-lo_bound)
 
 def Rconv_robust(series, x=None, alpha=0.7, axis=0):
     """
