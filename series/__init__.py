@@ -4,7 +4,7 @@ Creation, manipulation and resummation of series using numpy arrays or xarrays.
 Python3 only.
 """
 
-__author__ = 'Corentin Bertrand'
+__author__ = "Corentin Bertrand"
 
 from .arithmetics import *
 from .creation import *

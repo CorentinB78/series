@@ -22,30 +22,32 @@ def robust_pade(taylor_series, m, n, tol, full_output=False, rescale=True):
     if taylor_series.dtype == complex:
         dtype = complex
     else:
-        dtype = float 
+        dtype = float
 
     if m + n + 1 > len(taylor_series):
-        raise ValueError('Not enough coefficients in Taylor series for this type of Padé.')
+        raise ValueError(
+            "Not enough coefficients in Taylor series for this type of Padé."
+        )
 
     if rescale:
         try:
             r = float(Rconv_1d(taylor_series)[0])
-        except ValueError: # if only 1 non zero value
+        except ValueError:  # if only 1 non zero value
             r = 1.0
 
     c = _np.empty(m + n + 1, dtype=dtype)
     if len(taylor_series) < m + n + 1:
-        c[:len(taylor_series)] = taylor_series
-        c[len(taylor_series):] = 0.
+        c[: len(taylor_series)] = taylor_series
+        c[len(taylor_series) :] = 0.0
     else:
-        c[:] = taylor_series[:m + n + 1]
+        c[:] = taylor_series[: m + n + 1]
 
     if rescale:
         c = rescale_series(c, r)
 
     ts = tol * _linalg.norm(c)
 
-    if _np.max(_np.abs(c[:m + 1])) <= tol * _np.max(_np.abs(c)):
+    if _np.max(_np.abs(c[: m + 1])) <= tol * _np.max(_np.abs(c)):
         if full_output:
             return _np.zeros(1), _np.ones(1), None, None, n
         return _np.zeros(1), _np.ones(1)
@@ -55,12 +57,12 @@ def robust_pade(taylor_series, m, n, tol, full_output=False, rescale=True):
     chi = 0
     while True:
         if n == 0:
-            a = c[:m + 1]
+            a = c[: m + 1]
             b = _np.ones(1)
             break
-        Z = _linalg.toeplitz(col[:m + n + 1], row[:n + 1])
-        C = Z[m + 1:m + n + 1, :]
-        assert(C.shape == (n, n+1))
+        Z = _linalg.toeplitz(col[: m + n + 1], row[: n + 1])
+        C = Z[m + 1 : m + n + 1, :]
+        assert C.shape == (n, n + 1)
         U, S, Vh = _linalg.svd(C, full_matrices=True)
         rho = _np.sum(S > ts)
         chi += n - rho
@@ -68,7 +70,7 @@ def robust_pade(taylor_series, m, n, tol, full_output=False, rescale=True):
             break
         m = m - (n - rho)
         n = rho
-        assert(m >= 0)
+        assert m >= 0
 
     lam = 0
     if n > 0:
@@ -79,10 +81,10 @@ def robust_pade(taylor_series, m, n, tol, full_output=False, rescale=True):
         # Q, R = _linalg.qr(_np.dot(C, D).T)
         # b = _np.dot(D, Q[:, n]) ### out of range index!!
         b /= _linalg.norm(b)
-        a = _np.dot(Z[:m + 1, :n + 1], b)
+        a = _np.dot(Z[: m + 1, : n + 1], b)
         idx = _np.nonzero(_np.abs(b) > tol)[0]
         lam = idx[0]
-        b = b[lam:idx[-1] + 1]
+        b = b[lam : idx[-1] + 1]
         a = a[lam:]
 
     # a = a[:_np.nonzero(_np.abs(a) > ts)[0][-1] + 1]
@@ -111,17 +113,17 @@ def eval_pade(num, denom, U):
     return sum_series(num, U) / sum_series(denom, U)
 
 
-def find_poles_with_pade(series, max_ratio, transforms=None, tol=0.):
+def find_poles_with_pade(series, max_ratio, transforms=None, tol=0.0):
     """
     returns poles, zeros
     """
     if transforms is None:
         transforms = [IdentityTransform()]
     series_ = _np.asarray(series)
-    assert(series_.ndim == 1)
+    assert series_.ndim == 1
 
     max_ratio = float(max_ratio)
-    assert(max_ratio >= 1)
+    assert max_ratio >= 1
     order = len(series_) - 1
     zeros = []
     poles = []
@@ -132,9 +134,9 @@ def find_poles_with_pade(series, max_ratio, transforms=None, tol=0.):
             for m in range(order - l + 1):
                 if m / max_ratio <= l and l / max_ratio <= m:
                     try:
-    #                     p, q = pade(tr_series, l, m)
+                        #                     p, q = pade(tr_series, l, m)
                         p, q = robust_pade(tr_series, l, m, tol=tol)
-                    except ZeroDivisionError: # singular matrix
+                    except ZeroDivisionError:  # singular matrix
                         pass
                     else:
                         poles.extend([phi.rev(z) for z in _np.roots(q[::-1])])

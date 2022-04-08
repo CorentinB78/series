@@ -4,3 +4,4 @@ mpmath
 future
 matplotlib
 xarray
+black
