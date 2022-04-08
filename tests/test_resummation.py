@@ -4,9 +4,9 @@ from series.resummation import resum_series
 from series.resummation import Rconv_1d
 from series.resummation import Rconv_robust_1d
 from series.resummation import error_sum_series
+from series.resummation import EulerTransform
 
 # from series.resummation import sum_series
-from series.resummation import EulerTransform
 
 
 class TestRconv1D(unittest.TestCase):

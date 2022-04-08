@@ -16,13 +16,15 @@ from builtins import zip
 from builtins import range
 from builtins import object
 from past.utils import old_div
-
-# import warnings
 import numpy as np
 from copy import deepcopy
 from matplotlib import pyplot as plt
 from functools import reduce
 from scipy import stats
+import numpy.ma as ma
+from scipy.stats import mstats
+
+# import warnings
 
 
 # TODO: cleanup
@@ -463,9 +465,6 @@ class PtDTransform(object):
 
 
 ########## Convergence radius ##########
-
-import numpy.ma as ma
-from scipy.stats import mstats
 
 
 def _prepare_rconv_series(series, x=None):

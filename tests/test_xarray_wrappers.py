@@ -3,14 +3,9 @@ import numpy as np
 import xarray as xr
 from series import arithmetics
 from series import resummation
-
-# from series.xarray_wrappers import rescale_series
 from series.xarray_wrappers import prod_series
 from series.xarray_wrappers import one_over_series
 from series.xarray_wrappers import divide_series
-
-# from series.xarray_wrappers import compose_series
-# from series.xarray_wrappers import reverse_series
 from series.xarray_wrappers import error_sum_series
 
 # class TestRescaleSeries(unittest.TestCase):
