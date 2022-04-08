@@ -28,7 +28,10 @@ def robust_pade(taylor_series, m, n, tol, full_output=False, rescale=True):
         raise ValueError('Not enough coefficients in Taylor series for this type of Padé.')
 
     if rescale:
-        r = float(Rconv_1d(taylor_series)[0])
+        try:
+            r = float(Rconv_1d(taylor_series)[0])
+        except ValueError: # if only 1 non zero value
+            r = 1.0
 
     c = _np.empty(m + n + 1, dtype=dtype)
     if len(taylor_series) < m + n + 1:
