@@ -6,7 +6,7 @@ from series import resummation
 # from series.xarray_wrappers import rescale_series
 from series.xarray_wrappers import prod_series
 from series.xarray_wrappers import one_over_series
-# from series.xarray_wrappers import divide_series
+from series.xarray_wrappers import divide_series
 # from series.xarray_wrappers import compose_series
 # from series.xarray_wrappers import reverse_series
 from series.xarray_wrappers import error_sum_series
@@ -107,35 +107,51 @@ class TestOneOverSeries(unittest.TestCase):
         xr.testing.assert_allclose(b_ref, b)
 
 
-# class TestDivideSeries(unittest.TestCase):
+class TestDivideSeries(unittest.TestCase):
 
-#     def test_A(self):
-#         a = np.zeros(10)
-#         a[0] = 1.
-#         b = np.zeros(12)
-#         b[:2] = [-1., 1.] # b = X - 1
-#         res = -np.ones(10)
-#         assert np.allclose(divide_series(a, b), res)
+    def test_A(self):
+        a = np.zeros(10)
+        a[0] = 1.
+        a = xr.DataArray(a, {'order': range(len(a))}, ['order'])
 
-#     def test_B(self):
-#         a = np.array([0., 2., -3.j, 0., 0.], dtype=complex)
-#         b = np.array([1., 0., 0., -4., 0.], dtype=complex)
-#         res = np.array([0., 2., -3.j, 0., 8.], dtype=complex)
-#         assert np.allclose(divide_series(a, b), res)
-#         assert divide_series(a, b)[0] == 0.
+        b = np.zeros(12)
+        b[:2] = [-1., 1.] # b = X - 1
+        b = xr.DataArray(b, {'order': range(len(b))}, ['order'])
 
-#     def test_C(self):
-#         a = np.random.randn(10)
-#         b = np.random.randn(5)
-#         ab = prod_series(a, b)
-#         assert np.allclose(divide_series(ab, a), b)
-#         assert np.allclose(divide_series(ab, b), a[:5])
+        res = xr.DataArray(-np.ones(10), {'order': range(10)}, ['order'])
+        xr.testing.assert_allclose(divide_series(a, b, 'order'), res)
 
-#     def test_D(self):
-#         a = np.array([[0., 2., -3.j, 0., 0.], [0., 2., -3.j, 0., 0.]], dtype=complex)
-#         b = np.array([[1., 0., 0., -4., 0.], [1., 0., 0., -4., 0.]], dtype=complex)
-#         res = np.array([[0., 2., -3.j, 0., 8.], [0., 2., -3.j, 0., 8.]], dtype=complex)
-#         assert np.allclose(divide_series(a, b, axis=1), res)
+    def test_B(self):
+        a = xr.DataArray([0., 2., -3.j, 0., 0.], {'order': range(5)}, ['order'])
+        b = xr.DataArray([1., 0., 0., -4., 0.], {'order': range(5)}, ['order'])
+
+        res = xr.DataArray([0., 2., -3.j, 0., 8.], {'order': range(5)}, ['order'])
+        xr.testing.assert_allclose(divide_series(a, b, 'order'), res)
+
+    # def test_C(self):
+    #     a = np.random.randn(10)
+    #     b = np.random.randn(5)
+    #     ab = prod_series(a, b)
+    #     assert np.allclose(divide_series(ab, a), b)
+    #     assert np.allclose(divide_series(ab, b), a[:5])
+
+    def test_D(self):
+        a = np.array([[0., 2., -3.j, 0., 0.], [0., 2., -3.j, 0., 0.]], dtype=complex)
+        a = xr.DataArray(a, {'order': range(5), 'x': ['a', 'b']}, ['x', 'order'])
+        b = np.array([[1., 0., 0., -4., 0.], [1., 0., 0., -4., 0.]], dtype=complex)
+        b = xr.DataArray(b, {'order': range(5), 'x': ['a', 'b']}, ['x', 'order'])
+        res = np.array([[0., 2., -3.j, 0., 8.], [0., 2., -3.j, 0., 8.]], dtype=complex)
+        res = xr.DataArray(res, {'order': range(5), 'x': ['a', 'b']}, ['x', 'order'])
+        xr.testing.assert_allclose(divide_series(a, b, 'order'), res)
+
+    def test_E(self):
+        a = np.array([[0., 2., -3.j, 0., 0.], [0., 2., -3.j, 0., 0.]], dtype=complex)
+        a = xr.DataArray(a, {'order': range(5), 'x': ['a', 'b']}, ['x', 'order'])
+        b = np.array([1., 0., 0., -4., 0.], dtype=complex)
+        b = xr.DataArray(b, {'order': range(5)}, ['order'])
+        res = np.array([[0., 2., -3.j, 0., 8.], [0., 2., -3.j, 0., 8.]], dtype=complex)
+        res = xr.DataArray(res, {'order': range(5), 'x': ['a', 'b']}, ['x', 'order'])
+        xr.testing.assert_allclose(divide_series(a, b, 'order'), res)
 
 
 # class TestComposeSeries(unittest.TestCase):
