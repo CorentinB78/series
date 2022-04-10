@@ -10,11 +10,27 @@ from .arithmetics import rescale_series
 
 def robust_pade(taylor_series, m, n, tol, full_output=False, rescale=True):
     """
-    Compute robust Padé via SVD, as defined and implemented in
+    Compute robust Padé via SVD.
+
+    Defined and implemented in:
     Gonnet, Guttel, Trefethen, "Robust Padé Approximation via SVD", SIAM review Vol.55, No.1, pp.101-117
     DOI 10.1137/110853236
 
-    full output: a, b, chi, lambda, delta
+    Arguments:
+        taylor_series -- a (possibly complex) Taylor series
+        m -- degree of the numerator
+        n -- degree of the denominator
+        tol -- tolerance for singular values truncation
+
+    Keyword Arguments:
+        full_output -- if True, output is (numerator, denominator, chi, lambda, delta) (default: {False})
+        rescale -- if True, rescale the convergence radius of the series to 1 (default: {True})
+
+    Raises:
+        ValueError: Not enough coefficients in Taylor series for this type of Padé
+
+    Returns:
+        numerator, denominator
     """
     m = int(m)
     n = int(n)
@@ -115,7 +131,20 @@ def eval_pade(num, denom, U):
 
 def find_poles_with_pade(series, max_ratio, transforms=None, tol=0.0):
     """
-    returns poles, zeros
+    Find poles (and zeros) of an analytic function described by it Taylor series, using Padé interpolants.
+
+    If the numerator order is l and the denominator order is m, the function computes all Padés such that m / max_ratio <= l and l / max_ratio <= m. This way, max_ratio = 1 imposes using only the diagonal Padés, increasing max_ratio adds Padés in an angle around the diagonal.
+
+    Arguments:
+        series -- Taylor series
+        max_ratio -- number >= 1.0, defines which Padés are used.
+
+    Keyword Arguments:
+        transforms -- A conformal transformation performed before computing the interpolants (default: {None})
+        tol -- tolerance for robust Padé computation (default: {0.0})
+
+    Returns:
+        (poles, zeros) as lists
     """
     if transforms is None:
         transforms = [IdentityTransform()]
