@@ -719,7 +719,7 @@ class RealSeries(object):
             rconv = rconv_lower
 
         trunc_error = error_sum_series(
-            self._series_sampled.T, z, self._start_geom, Rc=rconv
+            self._series_sampled, z, self._start_geom, Rc=rconv
         )
 
         value_arr, trunc_error = self.phi_left(value_arr_0, z, trunc_error)
