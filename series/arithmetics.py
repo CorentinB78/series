@@ -1,8 +1,6 @@
 """
 Arithmetics of series.
 """
-# from __future__ import division
-# from __future__ import print_function
 import numpy as np
 
 
@@ -58,7 +56,6 @@ def one_over_series(series, axis=-1, one=1.0):
     Inverse (regarding multiplication) of a series, truncated at the same order.
     """
     series_ = np.asarray(series)
-    # series_inv = series_.copy() # output array has same axes order as input
     series_inv = np.empty_like(series_)  # output array has same ordering as input
     series_ = np.moveaxis(series_, axis, 0)
     view = np.moveaxis(series_inv, axis, 0)
@@ -131,21 +128,6 @@ def compose_series(series1, series2, axis1=-1, axis2=-1):
         output[0] += series1_[j]
 
     return np.moveaxis(output, 0, axis1)
-
-
-def sqrt_of_series(series):
-    """
-    Implementation not finished.
-    """
-    raise RuntimeError("Implementation not finished.")
-    # s0 = series[0]
-    # if np.abs(np.sum(s0)) == 0.:
-    #     raise ValueError('constant coefficient cannot be zero')
-
-    # s_sqrt = sqrt_series(len(series)-1, x0=s0)
-    # rest_series = series.copy()
-    # rest_series[0] = 0.
-    # return compose_series(s_sqrt, rest_series)
 
 
 def reverse_series(series, axis=0):

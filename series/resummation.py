@@ -1,8 +1,6 @@
 """
 Resummation of series.
 """
-from __future__ import division
-from __future__ import print_function
 from .arithmetics import (
     rescale_series,
     prod_series,
@@ -24,10 +22,6 @@ from scipy import stats
 import numpy.ma as ma
 from scipy.stats import mstats
 
-# import warnings
-
-
-# TODO: cleanup
 
 ########## Transformations ##########
 
@@ -482,8 +476,9 @@ def Rconv(series):
     y = np.log(np.abs(series))
     mask = np.isfinite(y)
     if (np.sum(mask, axis=0) < 2).any():
-        print("Problem with Rconv")
-        return None, None
+        raise ValueError(
+            "Not enough finite coefficients for evaluating a convergence radius."
+        )
     slopes = []
     errs = []
     for k in range(y.shape[1]):
@@ -583,14 +578,6 @@ def partial_sum_series(series, U, axis=0):
 
     output = np.squeeze(np.moveaxis(output, 0, axis))
     return output
-
-
-# print partial_sum_series(np.ones((5, 10)), np.arange(3), axis=1)
-# print sum_series(np.ones((5, 10)), np.arange(3), axis=1)
-# print
-
-# print partial_sum_series(np.ones((5, 10)), 4., axis=0)
-# print sum_series(np.ones((5, 10)), 4., axis=0)
 
 
 def error_sum_series(series, U_list, start_geom, Rc=None, axis=-1, verbose=True):
@@ -832,12 +819,13 @@ class RealSeries(object):
         )
         return tr_series_obj
 
-    def eliminate_order0(self):
+    def eliminate_order0(self, verbose=True):
 
         tr_series_obj = deepcopy(self)
         # TODO: adjust start_geom if necessary
         order_0 = np.mean(tr_series_obj._series_sampled[:, 0])
-        print(("Order 0 eliminated =", order_0))
+        if verbose:
+            print(("Order 0 eliminated =", order_0))
         tr_series_obj._series_sampled = tr_series_obj._series_sampled[:, 1:]
         tr_series_obj._phi_left_list.append(
             np.vectorize(lambda x, z: (z * x + order_0), excluded={1})

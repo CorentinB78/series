@@ -1,8 +1,6 @@
 """
 Creation of particular series.
 """
-# from __future__ import division
-# from __future__ import print_function
 from .arithmetics import rescale_series, divide_series
 from builtins import range
 import numpy as np

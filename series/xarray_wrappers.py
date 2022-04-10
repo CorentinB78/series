@@ -1,7 +1,6 @@
 """
 xarray wrappers for some functions dealing with numpy arrays.
 """
-# import numpy as np
 import xarray as xr
 from . import arithmetics
 from . import resummation
@@ -18,11 +17,6 @@ def _check_array(a, allow_number=False):
 
 
 ############################ arithmetics ##########################
-
-# def rescale_series(series, U, dim):
-# _check_array(series)
-# _check_array(U, True)
-#     return xr.apply_ufunc(arithmetics.rescale_series, series, U, input_core_dims=[[dim], []], output_core_dims=[[dim]], kwargs={'axis': -1})
 
 
 def prod_series(series1, series2, dim):
@@ -85,6 +79,7 @@ prod_series.__doc__ = arithmetics.prod_series.__doc__
 one_over_series.__doc__ = arithmetics.one_over_series.__doc__
 divide_series.__doc__ = arithmetics.divide_series.__doc__
 compose_series.__doc__ = arithmetics.compose_series.__doc__
+
 
 ########################## resummation ############################
 

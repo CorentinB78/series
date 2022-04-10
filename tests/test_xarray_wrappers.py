@@ -2,12 +2,12 @@ import unittest
 import numpy as np
 import xarray as xr
 from series import arithmetics
-from series import resummation
 from series.xarray_wrappers import prod_series
 from series.xarray_wrappers import one_over_series
 from series.xarray_wrappers import divide_series
 from series.xarray_wrappers import error_sum_series
 
+# TODO: write rescale_series for xr
 # class TestRescaleSeries(unittest.TestCase):
 
 #     def test_A(self):
@@ -153,12 +153,13 @@ class TestDivideSeries(unittest.TestCase):
         res = xr.DataArray([0.0, 2.0, -3.0j, 0.0, 8.0], {"order": range(5)}, ["order"])
         xr.testing.assert_allclose(divide_series(a, b, "order"), res)
 
-    # def test_C(self):
-    #     a = np.random.randn(10)
-    #     b = np.random.randn(5)
-    #     ab = prod_series(a, b)
-    #     assert np.allclose(divide_series(ab, a), b)
-    #     assert np.allclose(divide_series(ab, b), a[:5])
+    def test_C(self):
+        a = xr.DataArray(np.random.randn(10), {"order": range(10)}, ["order"])
+        b = xr.DataArray(np.random.randn(5), {"order": range(5)}, ["order"])
+
+        ab = prod_series(a, b, "order")
+        xr.testing.assert_allclose(divide_series(ab, a, "order"), b)
+        xr.testing.assert_allclose(divide_series(ab, b, "order"), a[:5])
 
     def test_D(self):
         a = np.array(
@@ -189,6 +190,7 @@ class TestDivideSeries(unittest.TestCase):
         xr.testing.assert_allclose(divide_series(a, b, "order"), res)
 
 
+# TODO: finish transposing tests
 # class TestComposeSeries(unittest.TestCase):
 
 #     def test_A(self):
