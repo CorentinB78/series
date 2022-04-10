@@ -29,33 +29,6 @@ from scipy.stats import mstats
 
 # TODO: cleanup
 
-# ########## Polynomials manipulation ##########
-
-# def prod_poly(poly1, poly2, dtype=complex):
-#     """
-#     Product of two polynomials.
-#     """
-#     d1, d2 = len(poly1)-1, len(poly2)-1
-#     output = np.zeros(d1 + d2 + 1, dtype=dtype)
-
-#     for n in range(len(output)):
-#         for k in range(max(0, n-d2), min(n, d1)+1):
-#             output[n] += poly1[k] * poly2[n - k]
-#     return output
-
-# def compose_poly(poly1, poly2, dtype=complex):
-#     """
-#     Composition of two polynomials.
-#     """
-#     d1 = len(poly1)-1
-#     output = [poly1[-1]]
-
-#     for j in range(d1-1, -1, -1):
-#         output = prod_poly(poly2, output, dtype=dtype)
-#         output[0] += poly1[j]
-
-#     return output
-
 ########## Transformations ##########
 
 
@@ -927,14 +900,3 @@ class RealSeries(object):
             )
         )
         return tr_series_obj
-
-
-if __name__ == "__main__":
-
-    # ### tests prod_poly
-    # assert np.array_equal(prod_poly([1, 0, 1], [1, 2]), np.array([1, 2, 1, 2], dtype=complex))
-
-    # ### tests compose_poly
-    # assert np.array_equal(compose_poly([1, 1, 1], [1j, 1]), np.array([1j, 1+2j, 1], dtype=complex))
-
-    print("All tests passed.")
