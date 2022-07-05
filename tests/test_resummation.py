@@ -48,6 +48,9 @@ class TestRconv1DRobust(unittest.TestCase):
         self.assertAlmostEqual(Rc, 0.5)
 
 
+# TODO: test other Rconv
+
+
 class TestResumSeries(unittest.TestCase):
     def test_A(self):
         a = (-1.0) ** np.arange(10)  # a = 1 / (X + 1)

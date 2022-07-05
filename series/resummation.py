@@ -511,6 +511,7 @@ def Rconv(series, x=None):
     Returns:
         Convergence radius, regression error
     """
+    # TODO: extand to larger dimensions
     if series.ndim == 1:
         series = series[..., None]
     if x is None:
@@ -553,6 +554,7 @@ def Rconv_robust(series, x=None, alpha=0.7, axis=0):
     Returns:
         convergence radius, lower bound, upper bound
     """
+    # TODO: extand to larger dimensions
     if series.ndim <= 1:
         return Rconv_robust_1d(series, x=x, alpha=alpha)
     series_ = np.moveaxis(series, axis, 0)
