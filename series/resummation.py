@@ -495,12 +495,15 @@ def Rconv_robust_1d(series, x=None, alpha=0.7, interc=False):
         return np.exp(-slope), np.exp(-up_bound), np.exp(-lo_bound)
 
 
-def Rconv(series):
+def Rconv(series, x=None):
     """
     Estimation of convergence radius
 
     Arguments:
         series -- 2D array, first axis represents orders
+
+    Keyword Arguments:
+        x -- array of orders (default: {None})
 
     Raises:
         ValueError: Not enough finite coefficients
@@ -510,7 +513,10 @@ def Rconv(series):
     """
     if series.ndim == 1:
         series = series[..., None]
-    x = np.arange(len(series))
+    if x is None:
+        x = np.arange(len(series))
+    else:
+        x = np.asarray(x)
     y = np.log(np.abs(series))
     mask = np.isfinite(y)
     if (np.sum(mask, axis=0) < 2).any():
@@ -552,6 +558,8 @@ def Rconv_robust(series, x=None, alpha=0.7, axis=0):
     series_ = np.moveaxis(series, axis, 0)
     if x is None:
         x = np.arange(len(series_))
+    else:
+        x = np.asarray(x)
     y = np.log(np.abs(series_)).reshape((len(series_), -1))
     slopes = []
     lo_bounds = []
