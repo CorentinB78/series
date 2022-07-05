@@ -452,6 +452,18 @@ def _prepare_rconv_series(series, x=None):
 
 
 def Rconv_1d(series, x=None):
+    """
+    Estimation of convergence radius. Fast method for single series.
+
+    Arguments:
+        series -- 1D array
+
+    Keyword Arguments:
+        x -- array of orders (default: {None})
+
+    Returns:
+        convergence radius, regression error, r value
+    """
     x, y = _prepare_rconv_series(series, x=x)
     slope, intercept, r_value, p_value, std_err = stats.mstats.linregress(x, y)
 
@@ -460,6 +472,20 @@ def Rconv_1d(series, x=None):
 
 
 def Rconv_robust_1d(series, x=None, alpha=0.7, interc=False):
+    """
+    Estimation of convergence radius. Use robust statistics. Fast method for single series.
+
+    Arguments:
+        series -- 1D array
+
+    Keyword Arguments:
+        x -- array of orders (default: {None})
+        alpha -- parameter for bounds (default: {0.7})
+        interc -- if True, returns (s0, q), where the regression gives the series s0 * q**n. (default: {False})
+
+    Returns:
+        If `interc` is False, returns (convergence radius, lower bound, upper bound)
+    """
     x, y = _prepare_rconv_series(series, x=x)
     slope, intercept, lo_bound, up_bound = mstats.theilslopes(y, x=x, alpha=alpha)
 
@@ -470,6 +496,18 @@ def Rconv_robust_1d(series, x=None, alpha=0.7, interc=False):
 
 
 def Rconv(series):
+    """
+    Estimation of convergence radius
+
+    Arguments:
+        series -- 2D array, first axis represents orders
+
+    Raises:
+        ValueError: Not enough finite coefficients
+
+    Returns:
+        Convergence radius, regression error
+    """
     if series.ndim == 1:
         series = series[..., None]
     x = np.arange(len(series))
@@ -496,7 +534,18 @@ def Rconv(series):
 
 def Rconv_robust(series, x=None, alpha=0.7, axis=0):
     """
-    Returns (Rc, lower, upper)
+    Estimation of convergence radius. Use robust statistics.
+
+    Arguments:
+        series -- 2D array
+
+    Keyword Arguments:
+        x -- array of orders (default: {None})
+        alpha -- parameter for bounds (default: {0.7})
+        axis -- axis representing orders (default: {0})
+
+    Returns:
+        convergence radius, lower bound, upper bound
     """
     if series.ndim <= 1:
         return Rconv_robust_1d(series, x=x, alpha=alpha)
